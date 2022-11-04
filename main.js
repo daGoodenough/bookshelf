@@ -22,4 +22,40 @@ function renderBooks () {
   }
 }
 
-renderBooks()
+
+function addBooks (data) {
+  books = [];
+
+  data.items.forEach(element => {
+    let book = {
+      title: element.volumeInfo.title || null,
+      author: element.volumeInfo.authors ? element.volumeInfo.authors[0] : null,
+      imageURL: element.volumeInfo.imageLinks ? element.volumeInfo.imageLinks.thumbnail : null,
+      isbn: element.volumeInfo.industryIdentifiers ? element.volumeInfo.industryIdentifiers[0].identifier : null,
+      pageCount: element.volumeInfo.pageCount || null
+    }
+    books.push(book);
+  });
+
+  renderBooks();
+}
+
+function fetch (query) {
+  $.ajax({
+    method: "GET",
+    url: "https://www.googleapis.com/books/v1/volumes?q=" + query,
+    dataType: "json",
+    success: function (data) {
+      addBooks(data);
+    },
+    error: function (jaXHR, textStatus, errorThrown) {
+      console.log(textStatus);
+    }
+  })
+}
+
+$('.search').on('click', function () {
+  let searchVal = $('#search-query').val();
+
+  fetch(searchVal);
+})
